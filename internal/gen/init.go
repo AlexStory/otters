@@ -29,14 +29,21 @@ func Init(name, path string) error {
 		return err
 	}
 
+	fmt.Printf("creating %s...\n", filepath.Join(path, "main.go"))
 	err := createFile("main.go", path, templates.MainTemplate, nil)
 	if err != nil {
 		return err
 	}
 
+	fmt.Printf("creating %s...\n", filepath.Join(path, "go.mod"))
 	if err = createFile("go.mod", path, templates.ModTemplate, data); err != nil {
 		return err
 	}
+
+	fmt.Println("all files created successfully!")
+	fmt.Println("run the following:")
+	fmt.Printf("cd %s\n", path)
+	fmt.Println("go mod tidy")
 	return nil
 }
 

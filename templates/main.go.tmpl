@@ -10,6 +10,7 @@ func main() {
 	app := otters.New()
 
 	app.WithStatic("/static/", "./static")
+	app.WithDefaultLogger()
 
 	app.Get("/ping", func(ctx otters.Ctx) {
 		ctx.String("ok")
