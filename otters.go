@@ -3,7 +3,6 @@ package otters
 import (
 	"fmt"
 	"net/http"
-	"time"
 )
 
 type App struct {
@@ -15,11 +14,6 @@ type App struct {
 }
 
 type Middleware func(http.Handler) http.Handler
-
-type Ctx struct {
-	Writer  http.ResponseWriter
-	Request *http.Request
-}
 
 // Creates a new default otters application
 func New() App {
@@ -71,15 +65,18 @@ func (a *App) Handle(pattern string, handler http.Handler) {
 //	app.Get("/ping", func(ctx otters.Ctx) {
 //	   ctx.Write("ok")
 //	})
-func (a *App) Get(pattern string, handler func(Ctx)) {
+func (a *App) Get(pattern string, handler func(Ctx), middleware ...Middleware) {
 	route := fmt.Sprintf("GET %s", pattern)
-	a.Mux.HandleFunc(route, func(w http.ResponseWriter, r *http.Request) {
+	funcHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := Ctx{
 			Writer:  w,
 			Request: r,
 		}
 		handler(ctx)
 	})
+
+	finalHandler := applyMiddleware(funcHandler, middleware...)
+	a.Mux.Handle(route, finalHandler)
 }
 
 // Create a post request route for the application
@@ -87,15 +84,17 @@ func (a *App) Get(pattern string, handler func(Ctx)) {
 // pattern: the route to listen to
 //
 // handler: takes the otters Context, and writes to it
-func (a *App) Post(pattern string, handler func(Ctx)) {
+func (a *App) Post(pattern string, handler func(Ctx), middleware ...Middleware) {
 	route := fmt.Sprintf("POST %s", pattern)
-	a.Mux.HandleFunc(route, func(w http.ResponseWriter, r *http.Request) {
+	funcHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := Ctx{
 			Writer:  w,
 			Request: r,
 		}
 		handler(ctx)
 	})
+	finalHandler := applyMiddleware(funcHandler, middleware...)
+	a.Mux.Handle(route, finalHandler)
 }
 
 // Tells the app to serve files from the directory on the given route
@@ -104,31 +103,9 @@ func (a *App) WithStatic(pattern, dir string) {
 	a.Mux.Handle(pattern, http.StripPrefix(pattern, fs))
 }
 
-func (a *App) WithDefaultLogger() {
-	logger := func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			start := time.Now()
-			ww := &responseWriter{w, http.StatusOK}
-			next.ServeHTTP(ww, r)
-			duration := time.Since(start)
-			fmt.Printf("%s %s %v %d\n", r.Method, r.URL.Path, duration, ww.statusCode)
-		})
+func applyMiddleware(handler http.Handler, middleware ...Middleware) http.Handler {
+	for i := len(middleware) - 1; i >= 0; i-- {
+		handler = middleware[i](handler)
 	}
-
-	a.Middleware(logger)
-}
-
-type responseWriter struct {
-	http.ResponseWriter
-	statusCode int
-}
-
-func (rw *responseWriter) WriteHeader(code int) {
-	rw.statusCode = code
-	rw.ResponseWriter.WriteHeader(code)
-}
-
-// Writes the given string to the otters Context
-func (c Ctx) String(content string) {
-	fmt.Fprint(c.Writer, content)
+	return handler
 }

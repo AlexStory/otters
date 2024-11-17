@@ -4,13 +4,14 @@ import (
     "log"
 
 	"github.com/alexstory/otters"
+	"github.com/alexstory/otters/middleware"
 )
 
 func main() {
 	app := otters.New()
 
 	app.WithStatic("/static/", "./static")
-	app.WithDefaultLogger()
+	app.Middleware(middleware.DefaultLogger())
 
 	app.Get("/ping", func(ctx otters.Ctx) {
 		ctx.String("ok")
