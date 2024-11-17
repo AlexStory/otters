@@ -7,8 +7,8 @@ import (
 
 type App struct {
 	Mux  *http.ServeMux
-	Port string
-	Host string
+	port string
+	host string
 
 	middleware []Middleware
 }
@@ -20,15 +20,15 @@ func New() App {
 	mux := http.NewServeMux()
 	return App{
 		Mux:        mux,
-		Port:       "8008",
-		Host:       "",
+		port:       "8008",
+		host:       "",
 		middleware: []Middleware{},
 	}
 }
 
 // Returns the network location that the app will listen on.
 func (a *App) GetNetworkLocation() string {
-	return fmt.Sprintf("%s:%s", a.Host, a.Port)
+	return fmt.Sprintf("%s:%s", a.host, a.port)
 }
 
 // Sets the app to listen on the set network location and return any error.
@@ -101,6 +101,16 @@ func (a *App) Post(pattern string, handler func(Ctx), middleware ...Middleware) 
 func (a *App) WithStatic(pattern, dir string) {
 	fs := http.FileServer(http.Dir(dir))
 	a.Mux.Handle(pattern, http.StripPrefix(pattern, fs))
+}
+
+// Sets the port for the application to listen on
+func (a *App) WithPort(port string) {
+	a.port = port
+}
+
+// Sets the host for the application to listen on
+func (a *App) WithHost(host string) {
+	a.host = host
 }
 
 func applyMiddleware(handler http.Handler, middleware ...Middleware) http.Handler {

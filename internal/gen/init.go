@@ -2,9 +2,7 @@ package gen
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
-	"text/template"
 
 	"github.com/alexstory/otters/templates"
 )
@@ -29,6 +27,12 @@ func Init(name, path string) error {
 		return err
 	}
 
+	templateDir := filepath.Join(path, "templates")
+	fmt.Printf("creating %s...\n", templateDir)
+	if err := createDir(templateDir); err != nil {
+		return err
+	}
+
 	fmt.Printf("creating %s...\n", filepath.Join(path, "main.go"))
 	err := createFile("main.go", path, templates.MainTemplate, nil)
 	if err != nil {
@@ -45,24 +49,4 @@ func Init(name, path string) error {
 	fmt.Printf("cd %s\n", path)
 	fmt.Println("go mod tidy")
 	return nil
-}
-
-func createFile(name, path, templateString string, data any) error {
-	t, err := template.New("temp").Parse(templateString)
-	if err != nil {
-		return err
-	}
-
-	filename := filepath.Join(path, name)
-	f, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-
-	defer f.Close()
-	return t.Execute(f, data)
-}
-
-func createDir(path string) error {
-	return os.MkdirAll(path, 0755)
 }
