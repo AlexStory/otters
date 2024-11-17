@@ -2,17 +2,20 @@ package main
 
 import (
     "log"
-	"net/http"
+
+	"github.com/alexstory/otters"
 )
 
 func main() {
-	mux := http.NewServeMux()
+	app := otters.New()
 
-	mux.HandleFunc("GET /ping", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("ok"))
+	app.WithStatic("/static/", "./static")
+
+	app.Get("/ping", func(ctx otters.Ctx) {
+		ctx.String("ok")
 	})
 
-	if err := http.ListenAndServe(":8008", mux); err != nil {
+	if err := app.Serve(); err != nil {
 		log.Fatal(err)
 	}
 

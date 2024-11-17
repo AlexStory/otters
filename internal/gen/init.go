@@ -1,6 +1,7 @@
 package gen
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -17,12 +18,18 @@ func Init(name, path string) error {
 		Name: name,
 	}
 
-	err := os.MkdirAll(path, 0755)
-	if err != nil {
+	fmt.Printf("creating %s...\n", path)
+	if err := createDir(path); err != nil {
 		return err
 	}
 
-	err = createFile("main.go", path, templates.MainTemplate, nil)
+	staticDir := filepath.Join(path, "static")
+	fmt.Printf("creating %s...\n", staticDir)
+	if err := createDir(staticDir); err != nil {
+		return err
+	}
+
+	err := createFile("main.go", path, templates.MainTemplate, nil)
 	if err != nil {
 		return err
 	}
@@ -47,4 +54,8 @@ func createFile(name, path, templateString string, data any) error {
 
 	defer f.Close()
 	return t.Execute(f, data)
+}
+
+func createDir(path string) error {
+	return os.MkdirAll(path, 0755)
 }

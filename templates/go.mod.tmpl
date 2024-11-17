@@ -1,3 +1,7 @@
-mod {{ .Name }}
+module {{ .Name }}
 
-require github.com/alexstory/otters
+// require github.com/alexstory/otters v0.1
+// temporary until 0.1 is pushed to github
+
+replace github.com/alexstory/otters => ../
+
