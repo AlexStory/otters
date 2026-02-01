@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>otters</title>
+    <link rel="stylesheet" href="/static/bulma.min.css" />
+</head>
+    <body>
+        <nav class="navbar is-white" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="/">
+                    <strong>Otters</strong>
+                </a>
+            </div>
+
+            <div class="navbar-menu">
+                <div class="navbar-end">
+                    <a class="navbar-item" href="/ping">Ping</a>
+                </div>
+            </div>
+        </nav>
+
+        {{ block "content" . }}{{ end }}
+
+        <footer class="footer">
+            <div class="content has-text-centered">
+                <p class="is-size-7">
+                    Built with <strong>otters</strong> (and good old <code>net/http</code> underneath).
+                </p>
+            </div>
+        </footer>
+    </body>
+</html>

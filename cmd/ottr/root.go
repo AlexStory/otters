@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/alexstory/otters/cmd/ottr/gen"
 	"github.com/alexstory/otters/cmd/ottr/new"
 	"github.com/alexstory/otters/cmd/ottr/version"
 )
@@ -23,6 +24,7 @@ visit github.com/alexstory/otters.`,
 func init() {
 	rootCmd.AddCommand(version.VersionCmd)
 	rootCmd.AddCommand(new.NewCmd)
+	rootCmd.AddCommand(gen.GenCmd)
 }
 
 func Execute() {

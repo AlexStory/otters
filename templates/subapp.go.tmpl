@@ -1,0 +1,15 @@
+package {{ .Package }}
+
+import (
+    "github.com/alexstory/otters"
+)
+
+func Mount(parent *otters.App) {
+    app := otters.SubApp(parent)
+
+    app.Get("/{$}", func(ctx *otters.Ctx) {
+        ctx.String("ok from {{ .Package }}")
+    })
+
+    parent.MountApp("{{ .Prefix }}", &app)
+}

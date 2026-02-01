@@ -1,0 +1,17 @@
+package main
+
+import "github.com/alexstory/otters"
+
+// Settings is the app configuration for otters apps.
+// Tweak these defaults as your app grows.
+var Settings = otters.Settings{
+	Dev: true,
+	Templates: otters.TemplateSettings{
+	    Dir: "./templates",
+	    Layout: "layout.html",
+	},
+	Static: otters.StaticSettings{
+	    Dir: "./static",
+	    Route: "/static/",
+	},
+}

@@ -22,6 +22,11 @@ func createFile(name, path, templateString string, data any) error {
 	return t.Execute(f, data)
 }
 
+func createRawFile(name, path, content string) error {
+	filename := filepath.Join(path, name)
+	return os.WriteFile(filename, []byte(content), 0644)
+}
+
 func createDir(path string) error {
 	return os.MkdirAll(path, 0755)
 }

@@ -1,0 +1,55 @@
+{{ define "content" }}
+<section class="hero is-link is-medium">
+    <div class="hero-body">
+        <div class="container">
+            <p class="title">Otters</p>
+            <p class="subtitle">
+                Your Otters app is up and running.
+                Templates, routes, and middleware—without the boilerplate.
+            </p>
+
+            <div class="buttons mt-5">
+                <a class="button is-white" href="/ping">
+                    Try /ping
+                </a>
+                <a class="button is-link is-light" href="https://pkg.go.dev/net/http" target="_blank" rel="noreferrer">
+                    net/http docs
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="columns is-variable is-6">
+            <div class="column">
+                <div class="box">
+                    <h2 class="title is-5">First-class templates</h2>
+                    <p class="content">
+                        Render HTML with a layout and a simple <code>ctx.Render(...)</code> call.
+                    </p>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="box">
+                    <h2 class="title is-5">Modular by design</h2>
+                    <p class="content">
+                        Use the parts you want. Keep access to the underlying <code>net/http</code>.
+                    </p>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="box">
+                    <h2 class="title is-5">Fast to start</h2>
+                    <p class="content">
+                        Scaffold, run, iterate. Production hardening can come after the hello page.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{{ end }}

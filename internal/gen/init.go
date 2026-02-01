@@ -33,8 +33,23 @@ func Init(name, path string) error {
 		return err
 	}
 
+	fmt.Printf("creating %s...\n", filepath.Join(templateDir, "layout.html"))
+	if err := createRawFile("layout.html", templateDir, templates.LayoutTemplate); err != nil {
+		return err
+	}
+
+	fmt.Printf("creating %s...\n", filepath.Join(templateDir, "index.html"))
+	if err := createRawFile("index.html", templateDir, templates.IndexTemplate); err != nil {
+		return err
+	}
+
 	fmt.Printf("creating %s...\n", filepath.Join(staticDir, "bulma.min.css"))
-	if err := createFile("bulma.min.css", staticDir, templates.BulmaTemplate, nil); err != nil {
+	if err := createRawFile("bulma.min.css", staticDir, templates.BulmaTemplate); err != nil {
+		return err
+	}
+
+	fmt.Printf("creating %s...\n", filepath.Join(path, "settings.go"))
+	if err := createFile("settings.go", path, templates.SettingsTemplate, nil); err != nil {
 		return err
 	}
 
