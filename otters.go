@@ -112,7 +112,7 @@ func (a *App) Handle(pattern string, handler http.Handler) {
 func (a *App) Get(pattern string, handler func(*Ctx), middleware ...Middleware) {
 	route := fmt.Sprintf("GET %s", pattern)
 	funcHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := a.newCtx(w, r)
+		ctx := a.NewCtx(w, r)
 		handler(ctx)
 	})
 
@@ -128,7 +128,7 @@ func (a *App) Get(pattern string, handler func(*Ctx), middleware ...Middleware) 
 func (a *App) Post(pattern string, handler func(*Ctx), middleware ...Middleware) {
 	route := fmt.Sprintf("POST %s", pattern)
 	funcHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := a.newCtx(w, r)
+		ctx := a.NewCtx(w, r)
 		handler(ctx)
 	})
 	finalHandler := applyMiddleware(funcHandler, middleware...)
@@ -169,7 +169,7 @@ func applyMiddleware(handler http.Handler, middleware ...Middleware) http.Handle
 	return handler
 }
 
-func (a *App) newCtx(w http.ResponseWriter, r *http.Request) *Ctx {
+func (a *App) NewCtx(w http.ResponseWriter, r *http.Request) *Ctx {
 	return &Ctx{
 		Writer:   w,
 		Request:  r,

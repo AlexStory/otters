@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{.StatusCode}}</title>
+    <style>
+        :root { color-scheme: light dark; }
+        body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; margin: 0; }
+        main { max-width: 900px; margin: 0 auto; padding: 24px; }
+        h1 { font-size: 18px; margin: 0 0 10px 0; }
+        .card { border: 1px solid rgba(127,127,127,.35); border-radius: 10px; padding: 14px 16px; }
+        .meta { opacity: .75; font-size: 13px; margin-bottom: 12px; }
+        pre { white-space: pre-wrap; word-break: break-word; margin: 0; font-size: 13px; line-height: 1.45; }
+        code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    </style>
+</head>
+<body>
+<main>
+    <div class="meta"><code>otters</code></div>
+    <div class="card">
+        <h1>{{.StatusCode}}</h1>
+        <pre>{{.Message}}</pre>
+    </div>
+</main>
+</body>
+</html>

@@ -3,8 +3,11 @@ package otters
 import (
 	"fmt"
 	"html/template"
+	"io/fs"
 	"net/http"
+	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Renderer interface {
@@ -31,10 +34,41 @@ func (r *HTMLRenderer) Render(w http.ResponseWriter, name string, data any) erro
 		return fmt.Errorf("layout template is not set")
 	}
 
-	layoutPath := filepath.Join(templateDir, layout)
-	pagePath := filepath.Join(templateDir, name)
+	root := os.DirFS(templateDir)
+	layoutPath := filepath.ToSlash(layout)
+	pagePath := filepath.ToSlash(name)
+	var partials []string
 
-	t, err := template.ParseFiles(layoutPath, pagePath)
+	if err := fs.WalkDir(root, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+
+		base := filepath.Base(path)
+		if strings.HasPrefix(base, "_") {
+			partials = append(partials, filepath.ToSlash(path))
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	paths := make([]string, 0, 2+len(partials))
+	paths = append(paths, layoutPath)
+
+	for _, p := range partials {
+		if p == layoutPath || p == pagePath {
+			continue
+		}
+		paths = append(paths, p)
+	}
+	paths = append(paths, pagePath)
+
+	t := template.New(filepath.Base(layout))
+	t, err := t.ParseFS(root, paths...)
 	if err != nil {
 		return err
 	}

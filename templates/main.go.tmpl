@@ -14,6 +14,7 @@ func main() {
 	app.WithSettings(Settings)
 
     app.Use(middleware.Recover(Settings.Dev))
+	app.Use(middleware.NotFound(&app))
 	app.Use(middleware.DefaultLogger())
 
 	// ottr:mounts

@@ -11,11 +11,19 @@ import (
 func TestHTMLRenderer_Render_Success(t *testing.T) {
 	dir := t.TempDir()
 
-	layout := `LayoutStart|{{template "index.html" .}}|LayoutEnd`
-	page := `Page:{{.Name}}`
+	// layout provides the "content" block
+	layout := `LayoutStart|{{ block "content" . }}(empty){{ end }}|LayoutEnd`
+
+	// page overrides the "content" block and uses a partial
+	page := `{{ define "content" }}{{ template "_header.html" . }}Page:{{ .Name }}{{ end }}`
+
+	partial := `Header:{{ .Name }}|`
 
 	if err := os.WriteFile(filepath.Join(dir, "layout.html"), []byte(layout), 0o644); err != nil {
 		t.Fatalf("write layout: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "_header.html"), []byte(partial), 0o644); err != nil {
+		t.Fatalf("write partial: %v", err)
 	}
 	if err := os.WriteFile(filepath.Join(dir, "index.html"), []byte(page), 0o644); err != nil {
 		t.Fatalf("write page: %v", err)
@@ -37,8 +45,8 @@ func TestHTMLRenderer_Render_Success(t *testing.T) {
 		t.Errorf("HTMLRenderer.Render returned wrong content type: got %q want %q", ct, "text/html")
 	}
 
-	if got := rr.Body.String(); got != "LayoutStart|Page:Otters|LayoutEnd" {
-		t.Errorf("HTMLRenderer.Render returned unexpected body: got %q want %q", got, "LayoutStart|Page:Otters|LayoutEnd")
+	if got := rr.Body.String(); got != "LayoutStart|Header:Otters|Page:Otters|LayoutEnd" {
+		t.Errorf("HTMLRenderer.Render returned unexpected body: got %q want %q", got, "LayoutStart|Header:Otters|Page:Otters|LayoutEnd")
 	}
 }
 
@@ -63,5 +71,46 @@ func TestHTMLRenderer_Render_EmptyLayout_Error(t *testing.T) {
 	rr := httptest.NewRecorder()
 	if err := r.Render(rr, "index.html", nil); err == nil {
 		t.Fatalf("expected error, got nil")
+	}
+}
+
+func TestHTMLRenderer_Render_BlocksDoNotLeakAcrossPages(t *testing.T) {
+	dir := t.TempDir()
+
+	layout := `{{ block "content" . }}(empty){{ end }}`
+
+	index := `{{ define "content" }}INDEX{{ end }}`
+	about := `{{ define "content" }}ABOUT{{ end }}`
+
+	if err := os.WriteFile(filepath.Join(dir, "layout.html"), []byte(layout), 0o644); err != nil {
+		t.Fatalf("write layout: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "index.html"), []byte(index), 0o644); err != nil {
+		t.Fatalf("write index: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "about.html"), []byte(about), 0o644); err != nil {
+		t.Fatalf("write about: %v", err)
+	}
+
+	settings := DefaultSettings()
+	settings.Templates.Dir = dir
+	settings.Templates.Layout = "layout.html"
+
+	r := NewHTMLRenderer(settings)
+
+	rr := httptest.NewRecorder()
+	if err := r.Render(rr, "index.html", nil); err != nil {
+		t.Fatalf("render index: %v", err)
+	}
+	if got := rr.Body.String(); got != "INDEX" {
+		t.Fatalf("body = %q, want %q", got, "INDEX")
+	}
+
+	rr2 := httptest.NewRecorder()
+	if err := r.Render(rr2, "about.html", nil); err != nil {
+		t.Fatalf("render about: %v", err)
+	}
+	if got := rr2.Body.String(); got != "ABOUT" {
+		t.Fatalf("body = %q, want %q", got, "ABOUT")
 	}
 }
