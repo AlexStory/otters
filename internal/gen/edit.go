@@ -20,8 +20,8 @@ func readModuleName(projectDir string) (string, error) {
 		if line == "" || strings.HasPrefix(line, "//") {
 			continue
 		}
-		if strings.HasPrefix(line, "module ") {
-			return strings.TrimSpace(strings.TrimPrefix(line, "module ")), nil
+		if after, ok := strings.CutPrefix(line, "module "); ok {
+			return strings.TrimSpace(after), nil
 		}
 	}
 	if err := sc.Err(); err != nil {
